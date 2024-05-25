@@ -3,8 +3,8 @@ export interface User {
   email: string;
   name: string;
   password: string;
-  address: string;
-  phone: string;
+  address?: string;
+  phone?: string;
   country?: string | undefined;
   city?: string | undefined;
 }

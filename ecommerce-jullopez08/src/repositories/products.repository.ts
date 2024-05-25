@@ -32,7 +32,47 @@ export class ProductsRepository {
       imgUrl: 'https://example.com/laptop_pro.jpg',
     },
   ];
-  getProducts() {
-    return this.products;
+  getProducts(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const usersPaginated = this.products.slice(skip, skip + limit);
+
+    return usersPaginated;
+  }
+
+  getProductId(id: number) {
+    return this.products.find((products) => products.id === id);
+  }
+
+  createProduct(product: Omit<Product, 'id'>) {
+    const id = this.products.length + 1;
+
+    this.products = [...this.products, { id, ...product }];
+
+    return product;
+  }
+
+  updateProducts(id: number, product: Product) {
+    const existinProduct = this.getProductId(id);
+
+    if (!existinProduct) return 'Product not found';
+
+    const updateProduct = { ...existinProduct, ...product };
+    this.products = this.products.map((products) =>
+      products.id === id ? updateProduct : products,
+    );
+
+    return updateProduct;
+  }
+
+  deleteProduct(id: number) {
+    const index = this.products.findIndex((products) => products.id === id);
+
+    if (!index) return 'Product not found';
+
+    const deleteProduct = this.products[index];
+
+    this.products = this.products.filter((products) => products.id !== id);
+
+    return deleteProduct;
   }
 }

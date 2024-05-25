@@ -33,7 +33,56 @@ export class UsersRepository {
       phone: '+1122334455',
     },
   ];
-  getUsers() {
-    return this.users;
+  getUsers(page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const usersPaginated = this.users.slice(skip, skip + limit);
+
+    const userSinPassword = usersPaginated.map(
+      ({ password, ...userNoPassword }) => userNoPassword,
+    );
+    return userSinPassword;
+  }
+  getUserByEmail(email: string) {
+    return this.users.find((users) => users.email === email);
+  }
+
+  getUserId(id: number) {
+    const idUSer = this.users.find((users) => users.id === id);
+    const { password, ...userNoPassword } = idUSer;
+    return userNoPassword;
+  }
+
+  createUser(user: Omit<User, 'id'>) {
+    const id = this.users.length + 1;
+
+    this.users = [...this.users, { id, ...user }];
+
+    return user;
+  }
+  updateUser(id: number, user: User) {
+    const existingUser = this.getUserId(id);
+
+    if (!existingUser) return 'User not found';
+
+    const updatedUser = { ...existingUser, ...user };
+    this.users = this.users.map((user) =>
+      user.id === id ? updatedUser : user,
+    );
+
+    const { password, ...userWithoutPassword } = updatedUser;
+    return userWithoutPassword;
+  }
+
+  deleteUser(id: number) {
+    const index = this.users.findIndex((users) => users.id === id);
+
+    if (!index) return 'User not found';
+
+    const deleteUser = this.users[index];
+
+    this.users = this.users.filter((users) => users.id !== id);
+
+    const { password, ...userNoPassword } = deleteUser;
+    return userNoPassword;
   }
 }
