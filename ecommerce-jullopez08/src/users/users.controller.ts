@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
   Query,
@@ -15,6 +16,8 @@ import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UserDbService } from './user-db.service';
 import { User } from 'src/entidades/users.entity';
+import { PutUserDto } from 'src/Dto/putUser.dto';
+import { CreateUserDto } from 'src/Dto/createUser.dto';
 
 @Controller('users')
 export class UsersController {
@@ -34,12 +37,15 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(AuthGuard)
-  getUsersById(@Param('id') id: string) {
-    return this.usersService.getUsersById(id);
+  getUsersById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.userBDService.getUsersById(id);
   }
 
   @Post()
-  createUser(@Body() body: any, @Req() request: Request & { now: string }) {
+  createUser(
+    @Body() body: CreateUserDto,
+    @Req() request: Request & { now: string },
+  ) {
     const creatUser = { ...body, createdAt: request.now };
     return this.userBDService.create(creatUser);
     // return this.usersService.createUser(body);
@@ -47,7 +53,7 @@ export class UsersController {
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  updateUser(@Param('id') id: string, @Body() body: User) {
+  updateUser(@Param('id') id: string, @Body() body: PutUserDto) {
     return this.usersService.updateUser(id, body);
   }
 

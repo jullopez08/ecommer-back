@@ -4,7 +4,6 @@ import { Categorie } from 'src/entidades/categories.entity';
 import { Product } from 'src/entidades/products.entity';
 import * as preCarga from '../utils/pre-carga.json';
 import { Repository } from 'typeorm';
-import { CreateProductDto } from 'src/Dto/create.products.dto';
 
 @Injectable()
 export class ProductsRepository {

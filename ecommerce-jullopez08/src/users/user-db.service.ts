@@ -12,4 +12,7 @@ export class UserDbService {
   async create(user: any) {
     return await this.userDBRepository.save(user);
   }
+  async getUsersById(id: string) {
+    return await this.userDBRepository.findOneBy({ id });
+  }
 }
