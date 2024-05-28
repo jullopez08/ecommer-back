@@ -1,78 +1,120 @@
-import { Injectable } from '@nestjs/common';
-import { Product } from 'src/interfaces/products.interface';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Categorie } from 'src/entidades/categories.entity';
+import { Product } from 'src/entidades/products.entity';
+import * as preCarga from '../utils/pre-carga.json';
+import { Repository } from 'typeorm';
+import { CreateProductDto } from 'src/Dto/create.products.dto';
 
 @Injectable()
 export class ProductsRepository {
-  private products: Product[] = [
-    {
-      id: 1,
-      name: 'Smartphone X',
-      description:
-        'A high-end smartphone with a sleek design and powerful features.',
-      price: 999.99,
-      stock: true,
-      imgUrl: 'https://example.com/smartphone_x.jpg',
-    },
-    {
-      id: 2,
-      name: 'Wireless Headphones',
-      description:
-        'Comfortable wireless headphones with noise cancellation and long battery life.',
-      price: 199.99,
-      stock: false,
-      imgUrl: 'https://example.com/wireless_headphones.jpg',
-    },
-    {
-      id: 3,
-      name: 'Laptop Pro',
-      description:
-        'A lightweight laptop with a high-resolution display and fast performance.',
-      price: 1299.99,
-      stock: true,
-      imgUrl: 'https://example.com/laptop_pro.jpg',
-    },
-  ];
-  getProducts(page: number, limit: number) {
-    const skip = (page - 1) * limit;
-    const usersPaginated = this.products.slice(skip, skip + limit);
+  constructor(
+    @InjectRepository(Product) private productsRepository: Repository<Product>,
+    @InjectRepository(Categorie)
+    private categoriesRepository: Repository<Categorie>,
+  ) {}
+  // private products: Product[] = [
+  //   {
+  //     id: 1,
+  //     name: 'Smartphone X',
+  //     description:
+  //       'A high-end smartphone with a sleek design and powerful features.',
+  //     price: 999.99,
+  //     stock: true,
+  //     imgUrl: 'https://example.com/smartphone_x.jpg',
+  //   },
+  //   {
+  //     id: 2,
+  //     name: 'Wireless Headphones',
+  //     description:
+  //       'Comfortable wireless headphones with noise cancellation and long battery life.',
+  //     price: 199.99,
+  //     stock: false,
+  //     imgUrl: 'https://example.com/wireless_headphones.jpg',
+  //   },
+  //   {
+  //     id: 3,
+  //     name: 'Laptop Pro',
+  //     description:
+  //       'A lightweight laptop with a high-resolution display and fast performance.',
+  //     price: 1299.99,
+  //     stock: true,
+  //     imgUrl: 'https://example.com/laptop_pro.jpg',
+  //   },
+  // ];
+  async getProducts(page: number, limit: number): Promise<Product[]> {
+    let products = await this.productsRepository.find({
+      relations: {
+        category: true,
+      },
+    });
 
-    return usersPaginated;
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    products = products.slice(start, end);
+    return products;
   }
 
-  getProductId(id: number) {
-    return this.products.find((products) => products.id === id);
+  async getProductId(id: string) {
+    const products = await this.productsRepository.findOneBy({ id });
+
+    if (!products)
+      throw new NotFoundException(`Product with id ${id} not found`);
+
+    return products;
   }
 
-  createProduct(product: Omit<Product, 'id'>) {
-    const id = this.products.length + 1;
+  // async createProduct(product: Omit<Product, 'id'>): Promise<Product> {
+  //   const newProduct = this.productsRepository.create(product);
+  //   await this.productsRepository.save(newProduct);
 
-    this.products = [...this.products, { id, ...product }];
+  //   return newProduct;
+  // }
+
+  async addProducts() {
+    const categories = await this.categoriesRepository.find();
+    preCarga?.map(async (element) => {
+      const category = categories.find(
+        (category) => category.name === element.category,
+      );
+
+      const product = new Product();
+      product.name = element.name;
+      product.description = element.description;
+      product.price = element.price;
+      product.stock = element.stock;
+      product.imgUrl = element.imgUrl;
+      product.category = category;
+
+      await this.productsRepository
+        .createQueryBuilder()
+        .insert()
+        .into(Product)
+        .values(product)
+        .orUpdate(['description', 'price', 'stock', 'imgUrl'], ['name'])
+        .execute();
+    });
+
+    return 'products added';
+  }
+
+  // async updateProduct(id: string, updateProductDto: CreateProductDto) {
+  //   const product = await this.productsRepository.findOne({ where: { id } });
+  //   if (!product) {
+  //     throw new NotFoundException(`Product with id ${id} not found`);
+  //   }
+  //   Object.assign(product, updateProductDto);
+  //   return await this.productsRepository.save(product);
+  // }
+
+  async deleteProduct(id: string) {
+    const product = await this.productsRepository.findOneBy({ id });
+
+    if (!product)
+      throw new NotFoundException(`Product with id ${id} not found`);
+
+    this.productsRepository.remove(product);
 
     return product;
-  }
-
-  updateProducts(id: number, product: Product) {
-    const existinProduct = this.getProductId(id);
-
-    if (!existinProduct) return 'Product not found';
-
-    const updateProduct = { ...existinProduct, ...product };
-    this.products = this.products.map((products) =>
-      products.id === id ? updateProduct : products,
-    );
-
-    return updateProduct;
-  }
-
-  deleteProduct(id: number) {
-    const index = this.products.findIndex((products) => products.id === id);
-
-    if (!index) return 'Product not found';
-
-    const deleteProduct = this.products[index];
-
-    this.products = this.products.filter((products) => products.id !== id);
-
-    return deleteProduct;
   }
 }
