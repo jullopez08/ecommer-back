@@ -1,5 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Product } from 'src/entidades/products.entity';
+import { FilesService } from 'src/files/files.service';
+import { FilesRepository } from 'src/repositories/files.repository';
 // import { Product } from 'src/interfaces/products.interface';
 import { ProductsRepository } from 'src/repositories/products.repository';
 

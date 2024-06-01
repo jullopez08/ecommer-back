@@ -1,4 +1,4 @@
-import { ArrayMaxSize, IsArray, IsNotEmpty, IsUUID } from 'class-validator';
+import { ArrayMinSize, IsArray, IsNotEmpty, IsUUID } from 'class-validator';
 import { Product } from 'src/entidades/products.entity';
 
 export class CreateOrderDto {
@@ -7,6 +7,6 @@ export class CreateOrderDto {
   userId: string;
 
   @IsArray()
-  @ArrayMaxSize(1)
+  @ArrayMinSize(1)
   products: Partial<Product>[];
 }

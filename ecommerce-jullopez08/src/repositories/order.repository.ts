@@ -16,10 +16,6 @@ export class OrderRepository {
     @InjectRepository(Product) private productRepository: Repository<Product>,
   ) {}
   async addOrder(userId: string, products: any[]) {
-    if (!products || !products.length) {
-      throw new Error('No products provided');
-    }
-
     let total = 0;
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
@@ -37,15 +33,21 @@ export class OrderRepository {
         const product = await this.productRepository.findOneBy({
           id: element.id,
         });
+        if (!products || !products.length) {
+          throw new NotFoundException('No products provided');
+        }
         if (!product) {
-          return { product: null, error: `Product ${element.id} not found` };
+          throw new NotFoundException({
+            product: null,
+            error: `Product ${element.id} not found`,
+          });
         }
 
         if (product.stock < 1) {
-          return {
+          throw new NotFoundException({
             product: null,
             error: `There is not enough stock of ${product.name}`,
-          };
+          });
         }
 
         total += Number(product.price);
@@ -87,72 +89,6 @@ export class OrderRepository {
       },
     });
   }
-  // async addOrder(userId: string, products: any) {
-  //   if (!products || !products.length)
-  //     throw new NotFoundException(`No products provided`);
-  //   let total = 0;
-  //   const user = await this.userRepository.findOneBy({ id: userId });
-  //   if (!user) throw new NotFoundException(`User ${userId} not found`);
-
-  //   const order = new Order();
-  //   order.date = new Date();
-  //   order.user = user;
-
-  //   const newOrder = await this.orderRepository.save(order);
-
-  //   //asociar cada id que recibimos con el producto
-  //   const productsArr = await Promise.all(
-  //     products.map(async (element) => {
-  //       const product = await this.productRepository.findOneBy({
-  //         id: element.id,
-  //       });
-  //       if (!product)
-  //         throw new NotFoundException(`Product ${element.id} not found`);
-
-  //       // verificar si hay stock
-  //       if (product.stock < 1)
-  //         throw new NotFoundException(
-  //           `There is not enough stock of ${product.name}`,
-  //         );
-  //       total += Number(product.price);
-
-  //       const validProduct = productsArr.filter((p) => p.product !== null);
-  //       const errors = productsArr
-  //         .filter((p) => p.product === null)
-  //         .map((p) => p.console.error);
-
-  //       if (validProduct.length === 0)
-  //         throw new NotFoundException(
-  //           `No valid products to create the order. Errors: ${errors.join(', ')}`,
-  //         );
-
-  //       //actualizar el stock
-  //       await Promise.all(
-  //         validProduct.map(async ({ product }) => {
-  //           await this.productRepository.update(
-  //             { id: product.id },
-  //             { stock: product.stock - 1 },
-  //           );
-  //         }),
-  //       );
-  //       return product;
-  //     }),
-  //   );
-  //   const orderDetails = new OrderDetails();
-
-  //   orderDetails.price = Number(Number(total).toFixed(2));
-  //   orderDetails.products = productsArr;
-  //   orderDetails.order_id = newOrder;
-
-  //   await this.orderDetailsRepository.save(orderDetails);
-
-  //   return await this.orderRepository.find({
-  //     where: { id: newOrder.id },
-  //     relations: {
-  //       orderDetail: true,
-  //     },
-  //   });
-  // }
 
   async getOrders(id: string) {
     const order = this.orderRepository.findOne({

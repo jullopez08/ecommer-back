@@ -1,18 +1,21 @@
 import {
-  Body,
   Controller,
   Delete,
+  FileTypeValidator,
+  FileValidator,
   Get,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
+  ParseUUIDPipe,
   Post,
-  Put,
   Query,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-// import { Product } from 'src/interfaces/products.interface';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { Product } from 'src/entidades/products.entity';
 
 @Controller('products')
 export class ProductsController {
@@ -35,25 +38,13 @@ export class ProductsController {
     return this.productsService.addProducts();
   }
   @Get(':id')
-  getProductById(@Param('id') id: string) {
+  getProductById(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.getProductById(id);
   }
 
-  // @Post()
-  // @UseGuards(AuthGuard)
-  // createProduct(@Body() body: Product) {
-  //   return this.productsService.createProduct(body);
-  // }
-
-  // @Put(':id')
-  // @UseGuards(AuthGuard)
-  // updateProduct(@Param('id') id: string, @Body() body: Product) {
-  //   return this.productsService.updateProduct(id, body);
-  // }
-
   @Delete(':id')
   @UseGuards(AuthGuard)
-  deleteProduct(@Param('id') id: string) {
+  deleteProduct(@Param('id', ParseUUIDPipe) id: string) {
     return this.productsService.deleteProduct(id);
   }
 }

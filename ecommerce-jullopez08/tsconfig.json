@@ -19,6 +19,6 @@
     "noFallthroughCasesInSwitch": false,
     "noUnusedLocals": false,
     "resolveJsonModule":true,
-
+    "types": ["Multer"]
   }
 }

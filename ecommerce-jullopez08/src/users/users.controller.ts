@@ -48,18 +48,17 @@ export class UsersController {
   ) {
     const creatUser = { ...body, createdAt: request.now };
     return this.userBDService.create(creatUser);
-    // return this.usersService.createUser(body);
   }
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  updateUser(@Param('id') id: string, @Body() body: PutUserDto) {
+  updateUser(@Param('id', ParseUUIDPipe) id: string, @Body() body: PutUserDto) {
     return this.usersService.updateUser(id, body);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  deleteUser(@Param('id') id: string) {
+  deleteUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.deleteUser(id);
   }
 }

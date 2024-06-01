@@ -12,35 +12,7 @@ export class ProductsRepository {
     @InjectRepository(Categorie)
     private categoriesRepository: Repository<Categorie>,
   ) {}
-  // private products: Product[] = [
-  //   {
-  //     id: 1,
-  //     name: 'Smartphone X',
-  //     description:
-  //       'A high-end smartphone with a sleek design and powerful features.',
-  //     price: 999.99,
-  //     stock: true,
-  //     imgUrl: 'https://example.com/smartphone_x.jpg',
-  //   },
-  //   {
-  //     id: 2,
-  //     name: 'Wireless Headphones',
-  //     description:
-  //       'Comfortable wireless headphones with noise cancellation and long battery life.',
-  //     price: 199.99,
-  //     stock: false,
-  //     imgUrl: 'https://example.com/wireless_headphones.jpg',
-  //   },
-  //   {
-  //     id: 3,
-  //     name: 'Laptop Pro',
-  //     description:
-  //       'A lightweight laptop with a high-resolution display and fast performance.',
-  //     price: 1299.99,
-  //     stock: true,
-  //     imgUrl: 'https://example.com/laptop_pro.jpg',
-  //   },
-  // ];
+
   async getProducts(page: number, limit: number): Promise<Product[]> {
     let products = await this.productsRepository.find({
       relations: {
@@ -62,13 +34,6 @@ export class ProductsRepository {
 
     return products;
   }
-
-  // async createProduct(product: Omit<Product, 'id'>): Promise<Product> {
-  //   const newProduct = this.productsRepository.create(product);
-  //   await this.productsRepository.save(newProduct);
-
-  //   return newProduct;
-  // }
 
   async addProducts() {
     const categories = await this.categoriesRepository.find();
@@ -96,15 +61,6 @@ export class ProductsRepository {
 
     return 'products added';
   }
-
-  // async updateProduct(id: string, updateProductDto: CreateProductDto) {
-  //   const product = await this.productsRepository.findOne({ where: { id } });
-  //   if (!product) {
-  //     throw new NotFoundException(`Product with id ${id} not found`);
-  //   }
-  //   Object.assign(product, updateProductDto);
-  //   return await this.productsRepository.save(product);
-  // }
 
   async deleteProduct(id: string) {
     const product = await this.productsRepository.findOneBy({ id });
