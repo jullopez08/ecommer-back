@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   ParseUUIDPipe,
   Post,
@@ -12,7 +13,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-// import { User } from 'src/interfaces/users.interface';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { UserDbService } from './user-db.service';
 import { User } from 'src/entidades/users.entity';
@@ -37,8 +37,13 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(AuthGuard)
-  getUsersById(@Param('id', ParseUUIDPipe) id: string) {
-    return this.userBDService.getUsersById(id);
+  async getUsersById(@Param('id', ParseUUIDPipe) id: string) {
+    const user = await this.userBDService.getUsersById(id);
+    if (!user) throw new NotFoundException('User not found');
+
+    const { password, ...userNotPassword } = user;
+
+    return userNotPassword;
   }
 
   @Post()

@@ -4,6 +4,7 @@ import { Categorie } from 'src/entidades/categories.entity';
 import { Product } from 'src/entidades/products.entity';
 import * as preCarga from '../utils/pre-carga.json';
 import { Repository } from 'typeorm';
+import { UpdateProductDto } from 'src/Dto/createProduct.dto';
 
 @Injectable()
 export class ProductsRepository {
@@ -62,6 +63,13 @@ export class ProductsRepository {
     return 'products added';
   }
 
+  async updateProduct(id: string, upProductDto: UpdateProductDto) {
+    const product = await this.productsRepository.findOne({ where: { id } });
+    if (!product)
+      throw new NotFoundException(`Product with id ${id} not found`);
+    Object.assign(product, upProductDto);
+    return await this.productsRepository.save(product);
+  }
   async deleteProduct(id: string) {
     const product = await this.productsRepository.findOneBy({ id });
 

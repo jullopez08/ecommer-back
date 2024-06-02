@@ -1,21 +1,17 @@
 import {
+  Body,
   Controller,
   Delete,
-  FileTypeValidator,
-  FileValidator,
   Get,
-  MaxFileSizeValidator,
+  Put,
   Param,
-  ParseFilePipe,
   ParseUUIDPipe,
-  Post,
   Query,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { UpdateProductDto } from 'src/Dto/createProduct.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -42,6 +38,14 @@ export class ProductsController {
     return this.productsService.getProductById(id);
   }
 
+  @Put(':id')
+  @UseGuards(AuthGuard)
+  updateProduct(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() product: UpdateProductDto,
+  ) {
+    return this.productsService.updateProduct(id, product);
+  }
   @Delete(':id')
   @UseGuards(AuthGuard)
   deleteProduct(@Param('id', ParseUUIDPipe) id: string) {

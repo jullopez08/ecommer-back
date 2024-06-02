@@ -1,25 +1,56 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entidades/users.entity';
+import { UserDbService } from 'src/users/user-db.service';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private readonly userDbServicce: UserDbService,
+    private readonly jwtService: JwtService,
+    // @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
   getAuth() {
     return 'esta es el get de auth';
   }
 
+  async signUp(user: Partial<User>) {
+    const findUser = await this.userDbServicce.findByEmail(user.email);
+    if (findUser) throw new BadRequestException(`user already exists`);
+
+    const hashedPassword = await bcrypt.hash(user.password, 10);
+    if (!hashedPassword) throw new BadRequestException(`password not hashed`);
+    const newUser = await this.userDbServicce.create({
+      ...user,
+      password: hashedPassword,
+    });
+
+    return newUser;
+  }
+
   async signIn(email: string, password: string) {
-    if (!email || !password) throw new NotFoundException(`invalid credentials`);
+    const users = await this.userDbServicce.findByEmail(email);
 
-    const users = await this.usersRepository.findOne({ where: { email } });
+    if (!users) throw new BadRequestException(`invalid credentials`);
 
-    if (!users) throw new NotFoundException(`invalid credentials user`);
-    if (users.password !== password)
-      throw new NotFoundException('invalid credentials password');
-    return 'logged in';
+    const isPasswordValid = await bcrypt.compare(password, users.password);
+
+    if (!isPasswordValid) throw new BadRequestException('invalid credentials');
+
+    const payload = {
+      id: users.id,
+      email: users.email,
+    };
+
+    const token = this.jwtService.sign(payload);
+    return { message: 'logged in', token };
   }
 }
+// if (!email || !password) throw new NotFoundException(`invalid credentials`);
