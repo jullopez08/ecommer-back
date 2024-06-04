@@ -17,9 +17,6 @@ export class AuthService {
     private readonly jwtService: JwtService,
     // @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
-  getAuth() {
-    return 'esta es el get de auth';
-  }
 
   async signUp(user: Partial<User>) {
     const findUser = await this.userDbServicce.findByEmail(user.email);
@@ -27,6 +24,7 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(user.password, 10);
     if (!hashedPassword) throw new BadRequestException(`password not hashed`);
+
     const newUser = await this.userDbServicce.create({
       ...user,
       password: hashedPassword,
@@ -47,6 +45,7 @@ export class AuthService {
     const payload = {
       id: users.id,
       email: users.email,
+      isAdmin: users.isAdmin,
     };
 
     const token = this.jwtService.sign(payload);

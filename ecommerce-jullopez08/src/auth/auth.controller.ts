@@ -12,10 +12,6 @@ import { CreateUserDto, LoginUserDto } from 'src/Dto/createUser.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get()
-  getAuth() {
-    return this.authService.getAuth();
-  }
   @Post('signin')
   signIn(@Body() credencials: LoginUserDto) {
     const { email, password } = credencials;
