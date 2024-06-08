@@ -1,14 +1,13 @@
 import { Module } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
-import { ProductsModule } from './products/products.module';
 import { AuthModule } from './auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { CategoriesModule } from './categories/categories.module';
 import { OrdersModule } from './orders/orders.module';
 import { FilesModule } from './files/files.module';
 import typeOrmConfig from './config/typeorm';
 import { JwtModule } from '@nestjs/jwt';
+import { AppInitializerModule } from './initializers/appInitializer.module';
 
 @Module({
   imports: [
@@ -23,9 +22,9 @@ import { JwtModule } from '@nestjs/jwt';
     }),
 
     UsersModule,
-    ProductsModule,
+
+    AppInitializerModule,
     AuthModule,
-    CategoriesModule,
     OrdersModule,
     FilesModule,
     JwtModule.register({

@@ -10,5 +10,6 @@ import { Categorie } from 'src/entidades/categories.entity';
   imports: [TypeOrmModule.forFeature([Product, Categorie])],
   controllers: [ProductsController],
   providers: [ProductsService, ProductsRepository],
+  exports: [ProductsService],
 })
 export class ProductsModule {}

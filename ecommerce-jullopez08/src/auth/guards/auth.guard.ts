@@ -27,10 +27,8 @@ export class AuthGuard implements CanActivate {
       // dar permisos de administrador
       payload.roles = payload.isAdmin ? [Role.Admin] : [Role.User];
 
-      console.log(payload, 'payload');
 
       request.user = payload;
-      console.log(request.user);
 
       return true;
     } catch (error) {

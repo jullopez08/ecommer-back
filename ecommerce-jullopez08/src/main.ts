@@ -11,9 +11,10 @@ async function bootstrap() {
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Ecommerce API 49')
     .setDescription(
-      'Esta es una API construida con NestJS empleada en el backend, donde se implementa los endpoints de un ecommerce con su CRUD y autenticación',
+      'Esta es una API construida con NestJS y Swagger donde se implementa los endpoints de un ecommerce con su CRUD y autenticación',
     )
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);

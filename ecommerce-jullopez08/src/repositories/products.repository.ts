@@ -14,6 +14,11 @@ export class ProductsRepository {
     private categoriesRepository: Repository<Categorie>,
   ) {}
 
+  async createProduct(product: Omit<Product, 'id'>) {
+    const newProduct = this.productsRepository.create(product);
+    return await this.productsRepository.save(newProduct);
+  }
+
   async getProducts(page: number, limit: number): Promise<Product[]> {
     let products = await this.productsRepository.find({
       relations: {
