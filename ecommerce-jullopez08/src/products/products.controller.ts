@@ -54,10 +54,11 @@ export class ProductsController {
     return this.productsService.getProductById(id);
   }
 
+  @ApiBearerAuth()
   @Post()
   @Roles(Role.Admin)
   @UseGuards(AuthGuard, RolesGuard)
-  createProduct(@Body() product: Product) {
+  createProduct(@Body() product: CreateProductDto) {
     return this.productsService.createProduct(product);
   }
 

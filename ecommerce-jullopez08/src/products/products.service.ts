@@ -1,9 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { CreateProductDto, UpdateProductDto } from 'src/Dto/createProduct.dto';
-import { Product } from 'src/entidades/products.entity';
-import { FilesService } from 'src/files/files.service';
-import { FilesRepository } from 'src/repositories/files.repository';
-// import { Product } from 'src/interfaces/products.interface';
 import { ProductsRepository } from 'src/repositories/products.repository';
 
 @Injectable()
@@ -18,7 +14,7 @@ export class ProductsService {
     return this.prosductsRepository.getProductId(id);
   }
 
-  createProduct(product: Product) {
+  createProduct(product: CreateProductDto) {
     return this.prosductsRepository.createProduct(product);
   }
 
@@ -31,5 +27,8 @@ export class ProductsService {
 
   deleteProduct(id: string) {
     return this.prosductsRepository.deleteProduct(id);
+  }
+  async productcCount(): Promise<number> {
+    return await this.prosductsRepository.count();
   }
 }

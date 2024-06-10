@@ -4,7 +4,7 @@ import { Categorie } from 'src/entidades/categories.entity';
 import { Product } from 'src/entidades/products.entity';
 import * as preCarga from '../utils/pre-carga.json';
 import { Repository } from 'typeorm';
-import { UpdateProductDto } from 'src/Dto/createProduct.dto';
+import { CreateProductDto, UpdateProductDto } from 'src/Dto/createProduct.dto';
 
 @Injectable()
 export class ProductsRepository {
@@ -13,9 +13,41 @@ export class ProductsRepository {
     @InjectRepository(Categorie)
     private categoriesRepository: Repository<Categorie>,
   ) {}
+  // async createProduct(product: CreateProductDto) {
+  //   const newProduct = this.productsRepository.create({
+  //     name: 'algo',
+  //     description: 'alo',
+  //     price: 9,
+  //     stock: 8,
+  //     imgUrl: 'df',
+  //     category: new Categorie(),
+  //   });
+  //   return await this.productsRepository.save(newProduct);
+  // }
+  async createProduct(product: CreateProductDto) {
+    const {
+      name,
+      description,
+      price,
+      stock,
+      imgUrl,
+      category: category,
+    } = product;
 
-  async createProduct(product: Omit<Product, 'id'>) {
-    const newProduct = this.productsRepository.create(product);
+    const findCategories = await this.categoriesRepository.findOne({
+      where: { id: category },
+    });
+    if (!findCategories)
+      throw new Error(`Category whith Id ${category} does not exist`);
+
+    const newProduct = this.productsRepository.create({
+      name,
+      description,
+      price,
+      stock,
+      imgUrl,
+      category: findCategories,
+    });
     return await this.productsRepository.save(newProduct);
   }
 
@@ -84,5 +116,8 @@ export class ProductsRepository {
     this.productsRepository.remove(product);
 
     return product;
+  }
+  async count(): Promise<number> {
+    return await this.categoriesRepository.count();
   }
 }

@@ -12,9 +12,21 @@ export class AppInitializer implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.categoriesService.addCategories();
-    await this.delay(5000);
-    await this.productsService.addProducts();
+    await this.loadCategoriesIfNoExist();
+    await this.delay(6000);
+    await this.loadProductsIfNoExist();
+  }
+  private async loadCategoriesIfNoExist() {
+    const categoriesCount = await this.categoriesService.countCategories();
+    if (!categoriesCount) {
+      await this.categoriesService.addCategories();
+    }
+  }
+  private async loadProductsIfNoExist() {
+    const productsCount = await this.productsService.productcCount();
+    if (!productsCount) {
+      await this.productsService.addProducts();
+    }
   }
 
   private delay(ms: number) {

@@ -14,7 +14,7 @@ import { FilesService } from './files.service';
 import { Express } from 'express';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
-import { FileUploadDto } from 'src/Dto/createProduct.dto';
+import { FileUploadDto } from 'src/Dto/fileUpload.dto';
 
 @ApiTags('files')
 @Controller('files')
@@ -29,7 +29,7 @@ export class FilesController {
   @Post('uploadImage/:id')
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('imgUrl'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     type: FileUploadDto,

@@ -6,6 +6,7 @@ import {
   IsOptional,
   MaxLength,
   Min,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateProductDto {
@@ -50,23 +51,18 @@ export class CreateProductDto {
    */
   @ApiProperty({
     description: 'add an image url',
-    type: String,
+    type: 'string',
     format: 'binary',
   })
-  @IsString()
   @IsOptional()
   @MaxLength(255)
-  imgUrl?: any;
+  imgUrl: string;
 
   /** Esta es la propiedad category. se encuentra precargada en la tabla categories
    */
 
-  @IsString()
+  @IsUUID()
   @IsNotEmpty()
   category: string;
 }
 export class UpdateProductDto extends PartialType(CreateProductDto) {}
-
-export class FileUploadDto extends PartialType(CreateProductDto) {
-  imgUrl?: any;
-}

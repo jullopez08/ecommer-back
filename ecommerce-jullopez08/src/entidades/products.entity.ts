@@ -37,5 +37,5 @@ export class Product {
   category: Categorie;
 
   @ManyToMany(() => OrderDetails, (orderDetail) => orderDetail.products)
-  orderDetails: OrderDetails[];
+  orderDetails?: OrderDetails[];
 }

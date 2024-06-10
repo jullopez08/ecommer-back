@@ -3,6 +3,7 @@ import { Categorie } from 'src/entidades/categories.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as preCarga from '../utils/pre-carga.json';
 import { Repository } from 'typeorm';
+import { createCategoriesDto } from 'src/Dto/createCategories.dto';
 
 @Injectable()
 export class CategoriesRepository {
@@ -13,6 +14,11 @@ export class CategoriesRepository {
 
   async getCategories() {
     return await this.categoriesRepository.find();
+  }
+
+  async createCategories(categories: createCategoriesDto) {
+    const newCategories = this.categoriesRepository.create(categories);
+    return await this.categoriesRepository.save(newCategories);
   }
 
   async addCategories() {
@@ -27,5 +33,8 @@ export class CategoriesRepository {
         .execute();
     });
     return 'categories added';
+  }
+  async count(): Promise<number> {
+    return await this.categoriesRepository.count();
   }
 }

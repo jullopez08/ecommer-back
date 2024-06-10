@@ -65,6 +65,7 @@ export class UsersController {
    * Este metodo te permite borrar el usuario logueado.
    */
   @Delete(':id')
+  @Roles(Role.Admin)
   deleteUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.userBDService.deleteUser(id);
   }
